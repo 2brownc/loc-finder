@@ -1,11 +1,10 @@
 import "~style.css"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface IDisplayLocInfo {
   city: string,
   country: string,
-  flag: string
 }
 
 function DisplayLocInfo({
@@ -21,15 +20,9 @@ function DisplayLocInfo({
   if(city === null || country === null) return <></>
   if(city === "" || country === "") return <></>
 
-  let flagEmoji = "";
-
-  if (flag !== "" && flag !== null) {
-    flagEmoji = `${flag} `;
-  }
-
   return (
     <div className="">
-      Your country is ${flagEmoji}${country} and your city is ${city}.
+      {`Your country is ${country} and your city is ${city}.`}
     </div>
   )
 }
@@ -45,10 +38,19 @@ function IndexPopup() {
   
   // state
   const [errorMsg, setErrorMsg] = useState<string | any>(null)
+
   const [IP, setIP] = useState<string | null>(null)
   const [country, setCountry] = useState<string | null>(null)
   const [city, setCity] = useState<string | null>(null)
   const [flag, setFlag] = useState<string | null>(null)
+
+  /*
+    if loadLocInfo is true
+    IP, city and country info
+    will be loaded
+  */
+  const [loadLocInfo, setLoadLocInfo] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // get IP address
   const getIP = async () => {
@@ -58,7 +60,7 @@ function IndexPopup() {
       const { ip } = await response.json()
       setIP(ip)
     } else {
-      const errorMessage = `Failed to get IP: ${response.status}`
+      const errorMessage = `Failed to get IP address: ${response.status}`
       setErrorMsg(errorMessage)
     }
   }  
@@ -68,27 +70,73 @@ function IndexPopup() {
     const response = await fetch(IPDATA_API_URL(IP), { method: 'GET'})
 
     if(response.ok){
-      const {country_name, t_city, emoji_flag} = await response.json()
+      const {country_name, city, emoji_flag} = await response.json()
       setCountry(country_name)
-      setCity(t_city)
+      setCity(city)
       setFlag(emoji_flag)
     } else {
       const errorMessage = `Failed to get IP location: ${response.status}`
       setErrorMsg(errorMessage)
     } 
   }
+
+  useEffect(() => {
+    if(loadLocInfo) {
+      /*
+        reset any previous results
+      */
+      setIP(null)
+      setCity(null)
+      setCountry(null)
+
+      setLoading(true)
+      getIP()
+    }
+  }, [loadLocInfo])
+
+  /*
+    once the IP is retrived
+    city and country information
+    will be retrived
+  */
+  useEffect(() => {      
+    if(IP !== null){
+      setLoading(true)
+      getLoc()
+    }
+  }, [IP])
+
+  /*
+    update "loading status" 
+  */
+  useEffect(() => {
+    const IPSet = IP !== null
+    const CountrySet = country !== null
+    const CitySet = city !== null
+    if(
+        IPSet &&
+        CountrySet &&
+        CitySet
+      ){
+        /*
+          all the information is loaded
+          the state is no longer "loading"
+        */
+      setLoading(false)
+    }
+  }, [IP, country, city])
   
   return (
     <div className="
-		plasmo-flex plasmo-items-center plasmo-justify-center
 		plasmo-h-[500px] plasmo-w-[500px]
     ">
 		<DisplayLocInfo
 			city={city}
 			country={country}
-      flag={flag}
 		/>
-		<button className="
+		<button
+      onClick={() => setLoadLocInfo(true)}
+      className="
       plasmo-w-60 plasmo-h-20
 			plasmo-border-solid plasmo-border-2 plasmo-border-indigo-600
       plasmo-bg-indigo-600
@@ -102,7 +150,12 @@ function IndexPopup() {
 		">
 			Show My Location
 		</button>
+
+    {/* show any errors */}
+    <div>
 		{errorMsg && <div>ERROR: {`${errorMsg}`}</div>}
+    </div>
+
     </div>
   )
 }
