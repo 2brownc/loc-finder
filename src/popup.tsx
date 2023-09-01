@@ -4,10 +4,15 @@ import React, { useState } from 'react';
 
 interface IDisplayLocInfo {
   city: string,
-  country: string
+  country: string,
+  flag: string
 }
 
-function DisplayLocInfo({city, country}: IDisplayLocInfo) {
+function DisplayLocInfo({
+  city,
+  country,
+  flag,
+}: IDisplayLocInfo) {
   /*
    display nothing if
    either of city or country
@@ -16,9 +21,15 @@ function DisplayLocInfo({city, country}: IDisplayLocInfo) {
   if(city === null || country === null) return <></>
   if(city === "" || country === "") return <></>
 
+  let flagEmoji = "";
+
+  if (flag !== "" && flag !== null) {
+    flagEmoji = `${flag} `;
+  }
+
   return (
     <div className="">
-      Your country is ${country} and your city is ${city}.
+      Your country is ${flagEmoji}${country} and your city is ${city}.
     </div>
   )
 }
@@ -28,15 +39,16 @@ function IndexPopup() {
   // ipify
   const IPIFY_API_URL: string = 'https://api.ipify.org?format=json'
   
-  //ipinfo
-  const IPINFO_API_URL: (arg0: string) => string = (ip) => 'https://ipinfo.io/${ip}'
-  const IPINFO_ACCESS_TOKEN = process.env.PLASMO_PUBLIC_IPINFO_ACCESS_TOKEN
+  //ipdata
+  const IPDATA_ACCESS_TOKEN = process.env.PLASMO_PUBLIC_IPDATA_ACCESS_TOKEN
+  const IPDATA_API_URL: (arg0: string) => string = (ip) => `https://api.ipdata.co/${ip}?api-key=${IPDATA_ACCESS_TOKEN}`
   
   // state
   const [errorMsg, setErrorMsg] = useState<string | any>(null)
   const [IP, setIP] = useState<string | null>(null)
   const [country, setCountry] = useState<string | null>(null)
-  const [city, setCity] = useState<string | null>(null)  
+  const [city, setCity] = useState<string | null>(null)
+  const [flag, setFlag] = useState<string | null>(null)
 
   // get IP address
   const getIP = async () => {
@@ -53,16 +65,13 @@ function IndexPopup() {
 
   // get location
   const getLoc = async () => {
-    const headers = {
-      Authorization: `Bearer ${IPINFO_ACCESS_TOKEN}`,
-    }
-
-    const response = await fetch(IPINFO_API_URL(IP), { headers })
+    const response = await fetch(IPDATA_API_URL(IP), { method: 'GET'})
 
     if(response.ok){
-      const {t_country, t_city} = await response.json()
-      setCountry(t_country)
+      const {country_name, t_city, emoji_flag} = await response.json()
+      setCountry(country_name)
       setCity(t_city)
+      setFlag(emoji_flag)
     } else {
       const errorMessage = `Failed to get IP location: ${response.status}`
       setErrorMsg(errorMessage)
@@ -77,6 +86,7 @@ function IndexPopup() {
 		<DisplayLocInfo
 			city={city}
 			country={country}
+      flag={flag}
 		/>
 		<button className="
       plasmo-w-60 plasmo-h-20
