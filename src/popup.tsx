@@ -2,6 +2,27 @@ import "~style.css"
 
 import React, { useState } from 'react';
 
+interface IDisplayLocInfo {
+  city: string,
+  country: string
+}
+
+function DisplayLocInfo({city, country}: IDisplayLocInfo) {
+  /*
+   display nothing if
+   either of city or country
+   are not set
+  */
+  if(city === null || country === null) return <></>
+  if(city === "" || country === "") return <></>
+
+  return (
+    <div className="">
+      Your country is ${country} and your city is ${city}.
+    </div>
+  )
+}
+
 function IndexPopup() {
   // api
   // ipify
@@ -50,8 +71,12 @@ function IndexPopup() {
   
   return (
     <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-h-[500px] plasmo-w-[500px]">
+		<DisplayLocInfo
+			city={city}
+			country={country}
+		/>
 		<button>
-			Show My Location
+			Show My Location0
 		</button>
     </div>
   )
