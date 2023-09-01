@@ -10,7 +10,6 @@ interface IDisplayLocInfo {
 function DisplayLocInfo({
   city,
   country,
-  flag,
 }: IDisplayLocInfo) {
   /*
    display nothing if
@@ -21,8 +20,11 @@ function DisplayLocInfo({
   if(city === "" || country === "") return <></>
 
   return (
-    <div className="">
-      {`Your country is ${country} and your city is ${city}.`}
+    <div className="plasmo-text-2xl">
+      <span>Your country is </span>
+      <span className="plasmo-text-green-700">{country}</span>
+      <span> and your city is </span>
+      <span className="plasmo-text-green-700">{city}</span>.
     </div>
   )
 }
@@ -123,37 +125,53 @@ function IndexPopup() {
           the state is no longer "loading"
         */
       setLoading(false)
+      setLoadLocInfo(false)
     }
   }, [IP, country, city])
   
   return (
     <div className="
-		plasmo-h-[500px] plasmo-w-[500px]
+		  plasmo-h-[500px] plasmo-w-[500px]
+      plasmo-grid plasmo-grid-cols-1 plasmo-place-content-center
+      plasmo-gap-4
+      plasmo-bg-gradient-to-l plasmo-from-red plasmo-to-blue
     ">
-		<DisplayLocInfo
-			city={city}
-			country={country}
-		/>
+    <div className="
+      plasmo-absolute
+      plasmo-top-8
+      plasmo-text-center
+    ">
+      <DisplayLocInfo
+        city={city}
+        country={country}
+      />
+    </div>
 		<button
       onClick={() => setLoadLocInfo(true)}
       className="
-      plasmo-w-60 plasmo-h-20
-			plasmo-border-solid plasmo-border-2 plasmo-border-indigo-600
-      plasmo-bg-indigo-600
-      plasmo-duration-500 plasmo-ease-out
-      hover:plasmo-border-blue-600
-      hover:plasmo-bg-blue-600
-      hover:plasmo-shadow-lg hover:plasmo-shadow-blue-500/50 
-      plasmo-p-5
-      plasmo-rounded-md
-      plasmo-text-xl plasmo-text-white
+        plasmo-place-self-center
+        plasmo-w-60 plasmo-h-20
+        plasmo-border-solid plasmo-border-2 plasmo-border-indigo-600
+        plasmo-bg-indigo-600
+        plasmo-duration-500 plasmo-ease-out
+        hover:plasmo-border-blue-600
+        hover:plasmo-bg-blue-600
+        hover:plasmo-shadow-lg hover:plasmo-shadow-blue-500/50 
+        plasmo-p-5
+        plasmo-rounded-md
+        plasmo-text-xl plasmo-text-white
 		">
-			Show My Location
+			{loading && <span>Loading...</span> || <span>Show My Location</span>}
 		</button>
 
     {/* show any errors */}
-    <div>
-		{errorMsg && <div>ERROR: {`${errorMsg}`}</div>}
+    <div className="
+      plasmo-absolute
+      plasmo-bottom-8
+      plasmo-text-center
+      plasmo-p-4
+    ">
+		{errorMsg && <span>ERROR: {`${errorMsg}`}</span>}
     </div>
 
     </div>
