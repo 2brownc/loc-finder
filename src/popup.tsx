@@ -70,14 +70,29 @@ function IndexPopup() {
   }
   
   return (
-    <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-h-[500px] plasmo-w-[500px]">
+    <div className="
+		plasmo-flex plasmo-items-center plasmo-justify-center
+		plasmo-h-[500px] plasmo-w-[500px]
+    ">
 		<DisplayLocInfo
 			city={city}
 			country={country}
 		/>
-		<button>
-			Show My Location0
+		<button className="
+      plasmo-w-60 plasmo-h-20
+			plasmo-border-solid plasmo-border-2 plasmo-border-indigo-600
+      plasmo-bg-indigo-600
+      plasmo-duration-500 plasmo-ease-out
+      hover:plasmo-border-blue-600
+      hover:plasmo-bg-blue-600
+      hover:plasmo-shadow-lg hover:plasmo-shadow-blue-500/50 
+      plasmo-p-5
+      plasmo-rounded-md
+      plasmo-text-xl plasmo-text-white
+		">
+			Show My Location
 		</button>
+		{errorMsg && <div>ERROR: {`${errorMsg}`}</div>}
     </div>
   )
 }
